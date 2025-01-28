@@ -21,6 +21,8 @@ router.get('/movie/search', MovieController.searchMovies);
 
 router.post('/movie/interaction', MovieController.recordInteraction);
 
+router.post('/movie/favorite', tokenAuth, MovieController.saveFavoriteMovie);
+
 
 
 export default router;

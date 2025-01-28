@@ -76,5 +76,53 @@ export default class MovieController {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     };
+
+    static saveFavoriteMovie = async (req, res) => {
+        try {
+            const { movieId } = req.body;
+            const userId = req.user.id;
+
+            if (!movieId) {
+                return res.status(400).json({ error: 'Movie ID is required.' });
+            }
+
+            const movie = await prisma.movie.findUnique({
+                where: { id: movieId },
+            });
+
+            if (!movie) {
+                return res.status(404).json({ error: 'Movie does not exist in the database.' });
+            }
+
+            const existingFavorite = await prisma.savedMovie.findUnique({
+                where: {
+                    userId_movieId: {
+                        userId,
+                        movieId,
+                    },
+                },
+            });
+
+            if (existingFavorite) {
+                return res.status(409).json({ error: 'Movie is already saved as a favorite.' });
+            }
+
+            const favorite = await prisma.savedMovie.create({
+                data: {
+                    userId,
+                    movieId,
+                },
+            });
+
+            return res.status(201).json({
+                message: 'Movie saved as favorite successfully.',
+                data: favorite,
+            });
+        } catch (error) {
+            console.error('Error saving favorite movie:', error);
+            return res.status(500).json({ error: 'Failed to save favorite movie.' });
+        }
+    };
+
 }
 
