@@ -15,15 +15,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  searches    SearchHistory[]
-  clicks      ClickTrack[]
-  savedMovies SavedMovie[]
+  searches     SearchHistory[]
+  savedMovies  SavedMovie[]
+  interactions MovieInteraction[]
 }
 
 model Movie {
   id          Int      @id @default(autoincrement())
   title       String
-  genre       String[]
+  genre       Json
   releaseYear Int
   rating      Float
   popularity  Float    @default(0)
@@ -31,9 +31,9 @@ model Movie {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  searches SearchHistory[]
-  clicks   ClickTrack[]
-  savedBy  SavedMovie[]
+  searches     SearchHistory[]
+  savedMovies  SavedMovie[]
+  interactions MovieInteraction[]
 }
 
 model SearchHistory {
@@ -47,19 +47,19 @@ model SearchHistory {
   movie Movie @relation(fields: [movieId], references: [id])
 
   @@index([userId, timestamp])
+  @@index([movieId, timestamp])
 }
 
-model ClickTrack {
+model MovieInteraction {
   id        Int      @id @default(autoincrement())
   userId    Int
   movieId   Int
   timestamp DateTime @default(now())
-  duration  Int
 
   user  User  @relation(fields: [userId], references: [id])
   movie Movie @relation(fields: [movieId], references: [id])
 
-  @@index([userId, movieId])
+  @@index([userId, movieId, timestamp])
 }
 
 model SavedMovie {

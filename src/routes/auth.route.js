@@ -1,7 +1,7 @@
-// routes/user.routes.js
 import express from 'express';
 import AuthController from '../controller/auth.controller.js';
 import tokenAuth from '../middleware/auth.middleware.js';
+import MovieController from '../controller/movies.controller.js';
 
 const router = express.Router();
 
@@ -9,12 +9,18 @@ router.get('/', (req, res) => {
     res.send('User route');
 })
 
-router.post('/register', AuthController.register);
+router.post('/auth/register', AuthController.register);
 
-router.post('/login', AuthController.login);
+router.post('/auth/login', AuthController.login);
 
-router.get('/me', tokenAuth, AuthController.getProfile);
+router.get('/auth/me', tokenAuth, AuthController.getProfile);
 
-router.post('/logout', tokenAuth, AuthController.logout);
+router.post('/auth/logout', tokenAuth, AuthController.logout);
+
+router.get('/movie/search', MovieController.searchMovies);
+
+router.post('/movie/interaction', MovieController.recordInteraction);
+
+
 
 export default router;
