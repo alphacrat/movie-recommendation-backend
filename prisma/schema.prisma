@@ -14,10 +14,47 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  avatar    String
 
   searches     SearchHistory[]
   savedMovies  SavedMovie[]
   interactions MovieInteraction[]
+}
+
+model SearchHistory {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  movieId    Int // No relation to Movie table
+  searchTerm String
+  timestamp  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, timestamp])
+  @@index([movieId, timestamp])
+}
+
+model MovieInteraction {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  movieId   Int // No relation to Movie table
+  timestamp DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, movieId, timestamp])
+}
+
+model SavedMovie {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  movieId   Int // No relation to Movie table
+  timestamp DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, movieId])
+  @@index([userId, timestamp])
 }
 
 model Movie {
@@ -30,47 +67,4 @@ model Movie {
   keywords    String[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  searches     SearchHistory[]
-  savedMovies  SavedMovie[]
-  interactions MovieInteraction[]
-}
-
-model SearchHistory {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  movieId    Int
-  searchTerm String
-  timestamp  DateTime @default(now())
-
-  user  User  @relation(fields: [userId], references: [id])
-  movie Movie @relation(fields: [movieId], references: [id])
-
-  @@index([userId, timestamp])
-  @@index([movieId, timestamp])
-}
-
-model MovieInteraction {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  movieId   Int
-  timestamp DateTime @default(now())
-
-  user  User  @relation(fields: [userId], references: [id])
-  movie Movie @relation(fields: [movieId], references: [id])
-
-  @@index([userId, movieId, timestamp])
-}
-
-model SavedMovie {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  movieId   Int
-  timestamp DateTime @default(now())
-
-  user  User  @relation(fields: [userId], references: [id])
-  movie Movie @relation(fields: [movieId], references: [id])
-
-  @@unique([userId, movieId])
-  @@index([userId, timestamp])
 }

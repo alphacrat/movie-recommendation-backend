@@ -17,11 +17,17 @@ router.get('/auth/me', tokenAuth, AuthController.getProfile);
 
 router.post('/auth/logout', tokenAuth, AuthController.logout);
 
-router.get('/movie/search', MovieController.searchMovies);
-
-router.post('/movie/interaction', MovieController.recordInteraction);
+router.get('/movie/search', tokenAuth, MovieController.searchMovies);
 
 router.post('/movie/favorite', tokenAuth, MovieController.saveFavoriteMovie);
+
+router.get('/movie/saved', tokenAuth, MovieController.getSavedMovies);
+
+router.delete('/movie/delete', tokenAuth, MovieController.deleteFavoriteMovie);
+
+router.put('/auth/updateAvatar', tokenAuth, AuthController.updateAvatar);
+
+
 
 
 

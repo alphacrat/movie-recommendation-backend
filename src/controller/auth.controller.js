@@ -1,4 +1,3 @@
-// controllers/authController.js
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
@@ -23,7 +22,7 @@ export default class AuthController {
 
     static async register(req, res) {
         try {
-            const { name, email, password } = req.body;
+            const { name, email, password, avatar } = req.body;
 
             if (!name || !email || !password) {
                 return res.status(400).json({ error: 'All fields are required' });
@@ -51,12 +50,14 @@ export default class AuthController {
                 data: {
                     name,
                     email,
-                    password: hashedPassword
+                    password: hashedPassword,
+                    avatar: avatar || ''
                 },
                 select: {
                     id: true,
                     name: true,
                     email: true,
+                    avatar: true,
                     createdAt: true
                 }
             });
@@ -78,6 +79,7 @@ export default class AuthController {
             res.status(500).json({ error: 'Server error during registration' });
         }
     }
+
 
     static async login(req, res) {
         try {
@@ -130,11 +132,7 @@ export default class AuthController {
                     name: true,
                     email: true,
                     createdAt: true,
-                    savedMovies: {
-                        include: {
-                            movie: true
-                        }
-                    }
+                    avatar: true
                 }
             });
 
@@ -153,15 +151,38 @@ export default class AuthController {
         try {
             res.clearCookie('access_token', {
                 path: '/',
-                secure: process.env.NODE_ENV === 'production',
                 httpOnly: true,
-                sameSite: 'strict'
             });
 
             res.json({ message: 'Logged out successfully' });
         } catch (error) {
             console.error('Logout error:', error);
             res.status(500).json({ error: 'Server error during logout' });
+        }
+    }
+
+    static async updateAvatar(req, res) {
+        try {
+            const { avatar } = req.body;
+            const userId = req.user.id;
+
+            if (!avatar) {
+                return res.status(400).json({ error: 'Avatar URL is required' });
+            }
+
+            const updatedUser = await prisma.user.update({
+                where: { id: userId },
+                data: { avatar },
+                select: { id: true, name: true, email: true, avatar: true }
+            });
+
+            res.json({
+                message: 'Avatar updated successfully',
+                user: updatedUser
+            });
+        } catch (error) {
+            console.error('Update avatar error:', error);
+            res.status(500).json({ error: 'Server error while updating avatar' });
         }
     }
 }
