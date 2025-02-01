@@ -3,9 +3,19 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
+// Built-in environment detection - no .env required
+const IS_PRODUCTION = process.env.NODE_ENV === 'production' ||
+    process.env.RENDER === 'true' ||
+    process.env.VERCEL === 'true' ||
+    process.env.RAILWAY === 'true';
+
 const COOKIE_OPTIONS = {
     httpOnly: true,
+    secure: IS_PRODUCTION,
+    sameSite: IS_PRODUCTION ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000,
+    path: '/',
+    domain: IS_PRODUCTION ? '.onrender.com' : undefined
 };
 
 function validateEmail(email) {
@@ -19,7 +29,6 @@ function validatePassword(password) {
 }
 
 export default class AuthController {
-
     static async register(req, res) {
         try {
             const { name, email, password, avatar } = req.body;
@@ -64,7 +73,7 @@ export default class AuthController {
 
             const token = jwt.sign(
                 { userId: user.id },
-                process.env.JWT_SECRET,
+                process.env.JWT_SECRET || 'fallback-secret-key-for-development',
                 { expiresIn: '24h' }
             );
 
@@ -72,14 +81,14 @@ export default class AuthController {
 
             res.status(201).json({
                 message: 'User registered successfully',
-                user
+                user,
+                token
             });
         } catch (error) {
             console.error('Register error:', error);
             res.status(500).json({ error: 'Server error during registration' });
         }
     }
-
 
     static async login(req, res) {
         try {
@@ -105,7 +114,7 @@ export default class AuthController {
 
             const token = jwt.sign(
                 { userId: user.id },
-                process.env.JWT_SECRET,
+                process.env.JWT_SECRET || 'fallback-secret-key-for-development',
                 { expiresIn: '24h' }
             );
 
@@ -115,7 +124,8 @@ export default class AuthController {
 
             res.json({
                 message: 'Login successful',
-                user: userWithoutPassword
+                user: userWithoutPassword,
+                token
             });
         } catch (error) {
             console.error('Login error:', error);
@@ -150,8 +160,8 @@ export default class AuthController {
     static async logout(req, res) {
         try {
             res.clearCookie('access_token', {
-                path: '/',
-                httpOnly: true,
+                ...COOKIE_OPTIONS,
+                maxAge: 0
             });
 
             res.json({ message: 'Logged out successfully' });
