@@ -4,20 +4,15 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Built-in environment detection - no .env required
-const IS_PRODUCTION = process.env.NODE_ENV === 'production' ||
-    process.env.RENDER === 'true' ||
-    process.env.VERCEL === 'true' ||
-    process.env.RAILWAY === 'true';
 
 const COOKIE_OPTIONS = {
     httpOnly: true,
-    secure: IS_PRODUCTION,
-    sameSite: IS_PRODUCTION ? 'none' : 'lax',
+    secure: true,  // Since you're using HTTPS
+    sameSite: 'none',  // For cross-origin requests
     maxAge: 24 * 60 * 60 * 1000,
     path: '/',
-    domain: IS_PRODUCTION ? '.onrender.com' : undefined
+    domain: 'movie-recommendation-backend-2opk.onrender.com'
 };
-
 function validateEmail(email) {
     return String(email)
         .toLowerCase()
