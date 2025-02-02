@@ -2,8 +2,7 @@ import pkg from 'pg';
 const { Pool } = pkg;
 
 const connectDB = async () => {
-    // Clean up the DATABASE_URL by properly handling the sslmode parameter
-    const databaseUrl = process.env.DATABASE_URL.split('?')[0];  // Remove the query parameters
+    const databaseUrl = process.env.DATABASE_URL.split('?')[0];
 
     const pool = new Pool({
         connectionString: databaseUrl,
