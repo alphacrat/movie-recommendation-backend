@@ -13,7 +13,7 @@ app.use(cors(
             'https://movie-recommendation-backend-2opk.onrender.com',
             'https://moviegenie-client.onrender.com',
             'https://moviegenie-yepb.onrender.com',
-            'https://movie-genie-woad.vercel.app/'],
+            'https://movie-genie-woad.vercel.app'],
         credentials: true
     }
 ))
