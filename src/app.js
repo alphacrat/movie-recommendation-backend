@@ -8,7 +8,7 @@ const app = express()
 app.use(cors(
     {
         // Built-in environment detection - no .env required
-        origin: ['http://localhost:5173', 'https://movie-recommendation-backend-2opk.onrender.com', 'https://moviegenie-client.onrender.com',],
+        origin: ['http://localhost:5173', 'https://movie-recommendation-backend-2opk.onrender.com', 'https://moviegenie-client.onrender.com', 'https://moviegenie-yepb.onrender.com'],
         credentials: true
     }
 ))
