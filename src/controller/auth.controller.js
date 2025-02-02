@@ -122,6 +122,8 @@ export default class AuthController {
 
             const { password: _, ...userWithoutPassword } = user;
 
+            console.log("login successful")
+
             res.json({
                 message: 'Login successful',
                 user: userWithoutPassword,
